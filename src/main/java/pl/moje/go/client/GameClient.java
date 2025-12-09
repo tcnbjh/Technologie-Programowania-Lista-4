@@ -30,7 +30,7 @@ public class GameClient {
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-            System.out.println("Połączono z serwerem " + host + ":" + port + " | " + in.readLine());
+            System.out.println("Połączono z serwerem " + host + ":" + port);
 
             String firstLine = in.readLine();
 
@@ -45,6 +45,10 @@ public class GameClient {
                 close();
                 return;
             }
+
+            System.out.println(firstLine);
+
+            connected = true;
 
 
 
@@ -67,11 +71,20 @@ public class GameClient {
 
     public void close(){
         try{
-            socket.close();
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
         } catch (IOException eignore){}
+
+        connected = false;
     }
 
     public void runInteractive(){
+        if (!connected){
+            System.out.println("Nie polaczono z serwerem.");
+            return;
+        }
+
         try(Scanner scanner = new Scanner(System.in)){
             String line;
             while(true){
