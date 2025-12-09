@@ -38,4 +38,12 @@ public class PlayerRegistry {
             return player;
         }
     }
+
+    public void removePlayer(Player player){
+        if (player == players[0]){
+            players[0] = null;
+        } else if (player == players[1]){
+            players[1] = null;
+        }
+    }
 }

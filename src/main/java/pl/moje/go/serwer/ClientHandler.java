@@ -6,9 +6,11 @@ import java.io.*;
 public class ClientHandler implements Runnable {
 
     private Socket socket;
+    private Player player;
 
-    ClientHandler(Socket socket){
+    ClientHandler(Socket socket, Player player){
         this.socket = socket;
+        this.player = player;
     }
 
     @Override
@@ -18,16 +20,18 @@ public class ClientHandler implements Runnable {
         try(BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 
+            out.println("ID gracza: " + player.getId() + ", kolor: " + player.getKolor());
+
             String line;
             while((line = in.readLine()) != null){
                 System.out.println("[" + socket.getInetAddress() + "] " + line);
-
-                out.println("ECHO: " + line);
 
                 if("EXIT".equalsIgnoreCase(line)){
                     System.out.println("Klient zamkniety");
                     break;
                 }
+
+                out.println("ECHO: " + line);
             }
 
         } catch (IOException e) {

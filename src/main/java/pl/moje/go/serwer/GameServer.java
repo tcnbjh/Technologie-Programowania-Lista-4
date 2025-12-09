@@ -10,7 +10,7 @@ public class GameServer {
 
     private final int port;
     private boolean running = true;
-    private PlayerRegistry playerRegistry = new PlayerRegistry();
+    private final PlayerRegistry playerRegistry = new PlayerRegistry();
 
     GameServer(int port){
         this.port = port;
@@ -27,12 +27,13 @@ public class GameServer {
                 Player player = playerRegistry.registerNewPlayer();
 
                 if(player == null){
+                    System.out.println("Gra jest już pełna -> odrzucam");
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                     out.println("FULL");
                     clientSocket.close();
                 } else {
                     System.out.println("Nowy klient: " + clientSocket.getInetAddress());
-                    ClientHandler handler = new ClientHandler(clientSocket);
+                    ClientHandler handler = new ClientHandler(clientSocket, player);
                     Thread thread = new Thread(handler);
                     thread.start();
                 }
