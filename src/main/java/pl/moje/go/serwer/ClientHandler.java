@@ -7,10 +7,12 @@ public class ClientHandler implements Runnable {
 
     private Socket socket;
     private Player player;
+    private final PlayerRegistry registry;
 
-    ClientHandler(Socket socket, Player player){
+    ClientHandler(Socket socket, Player player, PlayerRegistry registry){
         this.socket = socket;
         this.player = player;
+        this.registry = registry;
     }
 
     @Override
@@ -40,6 +42,7 @@ public class ClientHandler implements Runnable {
             try{
                 socket.close();
                 System.out.println("Socket zamkniety");
+
             } catch (IOException eignore) {}
         }
     }

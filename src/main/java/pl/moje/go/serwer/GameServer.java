@@ -33,7 +33,7 @@ public class GameServer {
                     clientSocket.close();
                 } else {
                     System.out.println("Nowy klient: " + clientSocket.getInetAddress());
-                    ClientHandler handler = new ClientHandler(clientSocket, player);
+                    ClientHandler handler = new ClientHandler(clientSocket, player, playerRegistry);
                     Thread thread = new Thread(handler);
                     thread.start();
                 }
