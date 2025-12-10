@@ -1,5 +1,7 @@
 package pl.moje.go.serwer;
 
+import pl.moje.go.common.Kolor;
+
 public class Player{
     private final int id;
     Kolor kolor;

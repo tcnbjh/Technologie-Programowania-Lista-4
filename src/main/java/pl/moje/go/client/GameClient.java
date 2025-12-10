@@ -1,7 +1,6 @@
 package pl.moje.go.client;
 
-import pl.moje.go.serwer.Kolor;
-import pl.moje.go.serwer.PlayerRegistry;
+import pl.moje.go.common.Kolor;
 
 import java.io.*;
 import java.net.Socket;

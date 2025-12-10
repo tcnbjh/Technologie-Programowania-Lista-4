@@ -1,6 +1,6 @@
 package pl.moje.go.serwer;
 
-import java.util.List;
+import pl.moje.go.common.Kolor;
 
 public class PlayerRegistry {
     private Player[] players = new Player[2];
