@@ -7,10 +7,12 @@ public class ClientHandler implements Runnable {
 
     private Socket socket;
     private Player player;
+    private PlayerRegistry registry; // potrzebuje registry, żeby usunąć gracza po wyjściu
 
-    ClientHandler(Socket socket, Player player){
+    ClientHandler(Socket socket, Player player,  PlayerRegistry registry) {
         this.socket = socket;
         this.player = player;
+        this.registry = registry;
     }
 
     @Override
@@ -41,6 +43,8 @@ public class ClientHandler implements Runnable {
                 socket.close();
                 System.out.println("Socket zamkniety");
             } catch (IOException eignore) {}
+
+            registry.removePlayer(player); // usuwam gracza z tablicy jak wyjdzie
         }
     }
 
