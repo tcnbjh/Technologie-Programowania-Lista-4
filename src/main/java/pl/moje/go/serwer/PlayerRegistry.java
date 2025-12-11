@@ -6,7 +6,7 @@ public class PlayerRegistry {
     private Player[] players = new Player[2];
     private int nextId = 0;
 
-    public boolean isFull(){
+    public synchronized boolean isFull(){
         return players[0] != null && players[1] != null;
     }
 
@@ -28,7 +28,7 @@ public class PlayerRegistry {
         }
     }
 
-    public Player registerNewPlayer(){
+    public synchronized Player registerNewPlayer(){
         if (isFull()){
             return null;
         } else {
@@ -39,7 +39,7 @@ public class PlayerRegistry {
         }
     }
 
-    public void removePlayer(Player player){
+    public synchronized void removePlayer(Player player){
         if (player == players[0]){
             players[0] = null;
         } else if (player == players[1]){

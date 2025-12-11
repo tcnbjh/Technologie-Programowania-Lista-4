@@ -11,8 +11,10 @@ public class GameServer {
     private final int port;
     private boolean running = true;
     private final PlayerRegistry playerRegistry = new PlayerRegistry();
+    private final GameController gameController;
 
     GameServer(int port){
+        this.gameController = new GameController();
         this.port = port;
     }
 
@@ -33,7 +35,7 @@ public class GameServer {
                     clientSocket.close();
                 } else {
                     System.out.println("Nowy klient: " + clientSocket.getInetAddress());
-                    ClientHandler handler = new ClientHandler(clientSocket, player, playerRegistry); // przekazuję jeszcze registry
+                    ClientHandler handler = new ClientHandler(clientSocket, player, playerRegistry, gameController); // przekazuję jeszcze registry
                     Thread thread = new Thread(handler);
                     thread.start();
                 }

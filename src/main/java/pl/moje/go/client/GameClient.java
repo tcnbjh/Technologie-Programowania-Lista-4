@@ -88,7 +88,7 @@ public class GameClient {
         try(Scanner scanner = new Scanner(System.in)){
             String line;
             while(true){
-                System.out.print("Ty: ");
+                System.out.print("> ");
                 line = scanner.nextLine();
                 sendLine(line);
 
