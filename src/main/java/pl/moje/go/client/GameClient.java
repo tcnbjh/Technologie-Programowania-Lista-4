@@ -29,6 +29,7 @@ public class GameClient {
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
             System.out.println("Połączono z serwerem " + host + ":" + port);
 
             String firstLine = in.readLine();
@@ -92,6 +93,11 @@ public class GameClient {
                 sendLine(line);
 
                 String response = readLine();
+
+                if(response == null){
+                    System.out.println("Serwer zamknal polaczenie");
+                    break;
+                }
                 System.out.println("Serwer: " + response);
                 if("EXIT".equalsIgnoreCase(line)){
                     break;
