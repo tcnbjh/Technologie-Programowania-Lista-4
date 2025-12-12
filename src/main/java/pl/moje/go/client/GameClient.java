@@ -19,6 +19,8 @@ public class GameClient {
     private Kolor myColor;
     private boolean connected = false;
 
+    private volatile boolean running;
+
     public GameClient(String host, int port){
         this.host = host;
         this.port = port;
@@ -85,26 +87,56 @@ public class GameClient {
             return;
         }
 
-        try(Scanner scanner = new Scanner(System.in)){
-            String line;
-            while(true){
-                System.out.print("> ");
-                line = scanner.nextLine();
-                sendLine(line);
+        running = true;
 
-                String response = readLine();
+        Thread receiver = new Thread(() -> {
+            try{
+                while (running){
+                    String line = readLine();
+                    if (line == null){
+                        System.out.println("Polacznie z serwerem zostalo przerwane");
+                        running = false;
+                        break;
+                    }
 
-                if(response == null){
-                    System.out.println("Serwer zamknal polaczenie");
-                    break;
+                    if ("BOARD".equals(line)){
+                        System.out.println("Aktualna plansza:");
+                        while (true){
+                            String boardLine = readLine();
+                            if (boardLine == null){
+                                System.out.println("Polacznie z serwerem zostalo przerwane");
+                                running = false;
+                                return;
+                            }
+                            if ("END_BOARD".equals(boardLine)){
+                                break;
+                            }
+                            System.out.println(boardLine);
+                        }
+                    } else {
+                        System.out.println("Serwer: " + line);
+                    }
                 }
-                System.out.println("Serwer: " + response);
-                if("EXIT".equalsIgnoreCase(line)){
+            } catch (Exception e) {
+                if (running){
+                    System.out.println("Blad podczas odbierania danych: " + e.getMessage());
+                }
+            }
+        });
+
+        receiver.setDaemon(true);
+        receiver.start();
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (running){
+                String input = scanner.nextLine();
+                sendLine(input);
+
+                if ("EXIT".equals(input)){
+                    running = false;
                     break;
                 }
             }
-        } finally {
-            close();
         }
     }
 }
