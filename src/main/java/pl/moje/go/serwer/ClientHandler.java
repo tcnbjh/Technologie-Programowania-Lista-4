@@ -2,13 +2,33 @@ package pl.moje.go.serwer;
 
 import java.net.Socket;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
+
+    private static final List<ClientHandler> handlers = new ArrayList<>();
+
+    private static synchronized void registerHandler(ClientHandler handler) {
+        handlers.add(handler);
+    }
+
+    private static synchronized void unregisterHandler(ClientHandler handler) {
+        handlers.remove(handler);
+    }
+
+    public static synchronized void broadcastBoard(GameController gameController) {
+        String ascii = gameController.getBoard().toAscii();
+        for (ClientHandler handler : handlers) {
+            handler.sendBoard(ascii);
+        }
+    }
 
     private Socket socket;
     private Player player;
     private PlayerRegistry registry; // potrzebuje registry, żeby usunąć gracza po wyjściu
     private GameController gameController;
+    private PrintWriter out;
 
     ClientHandler(Socket socket, Player player,  PlayerRegistry registry, GameController gameController) {
         this.socket = socket;
@@ -17,14 +37,31 @@ public class ClientHandler implements Runnable {
         this.gameController = gameController;
     }
 
+    void sendBoard(String asciiBoard) {
+        if (out == null) {
+            return;
+        }
+        out.println("BOARD");
+        for (String row : asciiBoard.split("\n")) {
+            out.println(row);
+        }
+        out.println("END_BOARD");
+    }
+
     @Override
     public void run(){
         System.out.println("Obsługuje klienta w watku: " + Thread.currentThread().getName());
 
         try(BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+
+            this.out = writer;
+
+            registerHandler(this);
 
             out.println("ID gracza: " + player.getId() + ", kolor: " + player.getKolor());
+
+            ClientHandler.broadcastBoard(gameController);
 
             String line;
             while((line = in.readLine()) != null){
@@ -58,6 +95,7 @@ public class ClientHandler implements Runnable {
 
                             if (ok){
                                 out.println("Wykonano ruch.");
+                                ClientHandler.broadcastBoard(gameController);
                             } else {
                                 out.println("MOVE_INVALID");
                             }
@@ -74,12 +112,12 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("Błąd połączenia z klientem" + e.getMessage());
         } finally {
+            unregisterHandler(this);
+            registry.removePlayer(player);
             try{
                 socket.close();
                 System.out.println("Socket zamkniety");
             } catch (IOException eignore) {}
-
-            registry.removePlayer(player); // usuwam gracza z tablicy jak wyjdzie
         }
     }
 

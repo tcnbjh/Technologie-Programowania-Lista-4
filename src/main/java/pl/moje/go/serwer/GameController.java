@@ -32,4 +32,7 @@ public class GameController {
         return true;
     }
 
+    public Board getBoard() {
+        return board;
+    }
 }
