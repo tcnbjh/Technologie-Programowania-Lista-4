@@ -53,12 +53,7 @@ public class Board {
     public String toAscii() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("  ");
-        for (int i = 0; i < size; i++) {
-            sb.append(i);
-        }
-        sb.append("\n");
-
+        sb.append("   ");
         for (int i = 0; i < size; i++) {
             sb.append(i).append(" ");
         }
@@ -79,7 +74,11 @@ public class Board {
                     case WHITE -> c = 'W';
                     default -> c = '□';
                 }
+
                 sb.append(c).append(" ");
+                if (j >= 10){
+                    sb.append(" ");
+                }
             }
 
             sb.append("\n");
