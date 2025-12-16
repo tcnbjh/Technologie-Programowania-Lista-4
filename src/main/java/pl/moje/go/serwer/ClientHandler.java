@@ -26,7 +26,7 @@ public class ClientHandler implements Runnable {
 
     private Socket socket;
     private Player player;
-    private PlayerRegistry registry; // potrzebuje registry, żeby usunąć gracza po wyjściu
+    private PlayerRegistry registry;
     private GameController gameController;
     private PrintWriter out;
 

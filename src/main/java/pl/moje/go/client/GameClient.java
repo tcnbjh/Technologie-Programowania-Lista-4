@@ -1,7 +1,5 @@
 package pl.moje.go.client;
 
-import pl.moje.go.common.Kolor;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -15,8 +13,6 @@ public class GameClient {
     private BufferedReader in;
     private PrintWriter out;
 
-    private int myId;
-    private Kolor myColor;
     private boolean connected = false;
 
     private volatile boolean running;

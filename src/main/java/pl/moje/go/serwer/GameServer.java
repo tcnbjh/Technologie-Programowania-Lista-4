@@ -46,9 +46,4 @@ public class GameServer {
 
         System.out.println("Serwer zamkniety");
     }
-
-    public void stop(){
-        running = false;
-    }
-
 }

@@ -10,10 +10,6 @@ public class GameController {
         this.board = new Board();
     }
 
-    public Kolor getTurn() {
-        return turn;
-    }
-
     public synchronized boolean makeMove(int x, int y, Kolor kolorGracza) {
         if (kolorGracza != turn){
             return false;

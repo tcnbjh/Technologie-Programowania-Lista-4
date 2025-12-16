@@ -18,17 +18,6 @@ public class Board {
         }
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public Kolor getField(int x, int y) {
-        if (!isOnBoard(x, y)){
-            throw new IllegalArgumentException("Poza plansza: (" + x + "," + y + ")");
-        }
-        return fields[x][y];
-    }
-
     private boolean isOnBoard(int x, int y) {
         return x >= 0 && x < size && y >= 0 && y < size;
     }

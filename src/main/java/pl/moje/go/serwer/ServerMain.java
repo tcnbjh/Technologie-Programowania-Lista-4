@@ -1,16 +1,10 @@
 package pl.moje.go.serwer;
 
-import java.net.Socket;
-
-
 class ServerMain{
-    private Socket socket;
     public static void main(String[] args) {
-        int port = 12345;
+        int port = 50000;
 
         GameServer server = new GameServer(port);
         server.start();
     }
 }
-
-
