@@ -86,6 +86,50 @@ public class Board {
         return sb.toString();
     }
 
+    public int countBreaths(int x, int y) {
+        if (!isOnBoard(x, y)){
+            throw new IllegalArgumentException("Poza plansza");
+        }
+
+        if (fields[x][y] == Kolor.NONE){
+            return 0;
+        }
+
+        int breaths = 0;
+
+        if (isOnBoard(x, y - 1) && fields[x][y - 1] == Kolor.NONE) breaths++;
+        if (isOnBoard(x, y + 1) && fields[x][y + 1] == Kolor.NONE) breaths++;
+        if (isOnBoard(x - 1, y) && fields[x - 1][y] == Kolor.NONE) breaths++;
+        if (isOnBoard(x + 1, y) && fields[x + 1][y] == Kolor.NONE) breaths++;
+
+        return breaths;
+    }
+
+    public void removeStone(int x, int y) {
+        if (isOnBoard(x, y)){
+            setField(x, y, Kolor.NONE);
+        }
+    }
+
+    public void removeStonesAround(int x, int y, Kolor opponentColor) {
+        int[][] dirs = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+
+        for (int[] d : dirs) {
+            int nx = x + d[0];
+            int ny = y + d[1];
+
+            if (isOnBoard(nx, ny) && fields[nx][ny] == opponentColor){
+                if (countBreaths(nx, ny) == 0){
+                    removeStone(nx, ny);
+                }
+            }
+        }
+    }
+
+    public boolean isSuicide(int x, int y){
+        return countBreaths(x, y) == 0;
+    }
+
     public String toString(){
         return toAscii();
     }

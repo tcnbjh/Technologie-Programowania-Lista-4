@@ -19,16 +19,23 @@ public class GameController {
             return false;
         }
 
-        boolean placed = board.placeStone(x, y, kolorGracza);
-
-        if (!placed){
+        if (!board.placeStone(x, y, kolorGracza)){
             return false;
-        } else{
-            System.out.println("Aktualna plansza po ruchu gracza " + kolorGracza + ":");
-            board.printBoard();
         }
 
-        turn = (turn == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+        Kolor opponent = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+
+        board.removeStonesAround(x, y, opponent);
+
+        if (board.isSuicide(x, y)){
+            board.removeStone(x, y);
+            return false;
+        }
+
+        System.out.println("Aktualna plansza po ruchu gracza " + kolorGracza + ":");
+        board.printBoard();
+
+        turn = opponent;
         return true;
     }
 
