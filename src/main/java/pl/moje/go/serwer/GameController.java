@@ -3,12 +3,8 @@ package pl.moje.go.serwer;
 import pl.moje.go.common.Kolor;
 
 public class GameController {
-    private final Board board;
+    private final Board board = new  Board();
     private Kolor turn = Kolor.BLACK;
-
-    public GameController() {
-        this.board = new Board();
-    }
 
     public synchronized boolean makeMove(int x, int y, Kolor kolorGracza) {
         if (kolorGracza != turn){
@@ -28,14 +24,11 @@ public class GameController {
             return false;
         }
 
-        System.out.println("Aktualna plansza po ruchu gracza " + kolorGracza + ":");
-        board.printBoard();
-
         turn = opponent;
         return true;
     }
 
-    public Board getBoard() {
-        return board;
+    public synchronized String boardSnapshotAscii(){
+        return board.toAscii();
     }
 }

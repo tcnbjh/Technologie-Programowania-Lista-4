@@ -1,5 +1,7 @@
 package pl.moje.go.client;
 
+import static pl.moje.go.common.Protocol.*;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -38,7 +40,7 @@ public class GameClient {
                 return;
             }
 
-            if ("FULL".equals(firstLine)){
+            if (MSG_FULL.equals(firstLine)){
                 System.out.println("Serwer: gra jest pełna");
                 close();
                 return;
@@ -95,7 +97,7 @@ public class GameClient {
                         break;
                     }
 
-                    if ("BOARD".equals(line)){
+                    if (BOARD_BEGIN.equals(line)){
                         System.out.println("Aktualna plansza:");
                         while (true){
                             String boardLine = readLine();
@@ -104,7 +106,7 @@ public class GameClient {
                                 running = false;
                                 return;
                             }
-                            if ("END_BOARD".equals(boardLine)){
+                            if (BOARD_END.equals(boardLine)){
                                 break;
                             }
                             System.out.println(boardLine);
@@ -128,7 +130,7 @@ public class GameClient {
                 String input = scanner.nextLine();
                 sendLine(input);
 
-                if ("EXIT".equals(input)){
+                if (CMD_EXIT.equals(input)){
                     running = false;
                     break;
                 }

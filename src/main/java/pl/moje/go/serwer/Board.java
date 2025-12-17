@@ -8,8 +8,8 @@ public class Board {
     private final int size = 19;
     private final Kolor[][] fields;
 
-    Board () {
-        this.fields = new Kolor[size][size];
+    Board() {
+        fields = new Kolor[size][size];
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -117,13 +117,5 @@ public class Board {
 
     public boolean isSuicide(int x, int y){
         return countBreaths(x, y) == 0;
-    }
-
-    public String toString(){
-        return toAscii();
-    }
-
-    public void printBoard(){
-        System.out.println(toAscii());
     }
 }

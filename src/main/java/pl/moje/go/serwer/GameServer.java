@@ -1,20 +1,18 @@
 package pl.moje.go.serwer;
 
+import pl.moje.go.common.Protocol;
+
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.io.IOException;
-
 
 public class GameServer {
 
     private final int port;
     private boolean running = true;
-    private final PlayerRegistry playerRegistry = new PlayerRegistry();
-    private final GameController gameController;
+    private final GameSession session = new GameSession();
 
     GameServer(int port){
-        this.gameController = new GameController();
         this.port = port;
     }
 
@@ -26,21 +24,19 @@ public class GameServer {
                 System.out.println("Czekam na klienta");
                 Socket clientSocket = serverSocket.accept();
 
-                Player player = playerRegistry.registerNewPlayer();
+                Player player = session.registerPlayer();
 
                 if(player == null){
-                    System.out.println("Gra jest już pełna -> odrzucam");
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    out.println("FULL");
+                    out.println(Protocol.MSG_FULL);
                     clientSocket.close();
-                } else {
-                    System.out.println("Nowy klient: " + clientSocket.getInetAddress());
-                    ClientHandler handler = new ClientHandler(clientSocket, player, playerRegistry, gameController); // przekazuję jeszcze registry
-                    Thread thread = new Thread(handler);
-                    thread.start();
+                    continue;
                 }
+
+                ClientHandler handler = new ClientHandler(clientSocket, session, player);
+                new Thread(handler).start();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
