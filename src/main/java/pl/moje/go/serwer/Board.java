@@ -1,12 +1,15 @@
 package pl.moje.go.serwer;
 
 import pl.moje.go.common.Kolor;
+import java.util.ArrayList;
 
 
 public class Board {
 
     private final int size = 19;
     private final Kolor[][] fields;
+    private final MoveValidator validator = new MoveValidator();
+    private final StoneRemover remover = new StoneRemover();
 
     Board() {
         fields = new Kolor[size][size];
@@ -31,13 +34,36 @@ public class Board {
             return false;
         }
 
-        fields[x][y] = color;
+        if(!validator.isValidMove(fields, x, y, color)){
+            return false;
+        }
+
+        validator.clearBlocked(color);
+
+        setField(x, y, color);
+
+        ArrayList<Integer> list = remover.removeAround(x, y, fields, color);
+
+        int dlg = list.size();
+
+        System.out.println(list);
+
+        for(int i = 0; i < dlg - 1; i = i + 2){
+            validator.setBlock(list.get(i), list.get(i+1), color);
+        }
+
         return true;
     }
 
-    private void setField(int x, int y, Kolor color) {
+    public MoveValidator getValidator(){
+        return validator;
+    }
+
+
+    private void setField(int x, int y, Kolor color){
         fields[x][y] = color;
     }
+
 
     public String toAscii() {
         StringBuilder sb = new StringBuilder();
@@ -75,47 +101,4 @@ public class Board {
         return sb.toString();
     }
 
-    public int countBreaths(int x, int y) {
-        if (!isOnBoard(x, y)){
-            throw new IllegalArgumentException("Poza plansza");
-        }
-
-        if (fields[x][y] == Kolor.NONE){
-            return 0;
-        }
-
-        int breaths = 0;
-
-        if (isOnBoard(x, y - 1) && fields[x][y - 1] == Kolor.NONE) breaths++;
-        if (isOnBoard(x, y + 1) && fields[x][y + 1] == Kolor.NONE) breaths++;
-        if (isOnBoard(x - 1, y) && fields[x - 1][y] == Kolor.NONE) breaths++;
-        if (isOnBoard(x + 1, y) && fields[x + 1][y] == Kolor.NONE) breaths++;
-
-        return breaths;
-    }
-
-    public void removeStone(int x, int y) {
-        if (isOnBoard(x, y)){
-            setField(x, y, Kolor.NONE);
-        }
-    }
-
-    public void removeStonesAround(int x, int y, Kolor opponentColor) {
-        int[][] dirs = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
-
-        for (int[] d : dirs) {
-            int nx = x + d[0];
-            int ny = y + d[1];
-
-            if (isOnBoard(nx, ny) && fields[nx][ny] == opponentColor){
-                if (countBreaths(nx, ny) == 0){
-                    removeStone(nx, ny);
-                }
-            }
-        }
-    }
-
-    public boolean isSuicide(int x, int y){
-        return countBreaths(x, y) == 0;
-    }
 }

@@ -39,4 +39,12 @@ public class GameSession {
         }
         return ok;
     }
+
+    public synchronized void pass(Player player){
+        gameController.pass(player.getKolor());
+    }
+
+    public synchronized void ff(Player player){
+        gameController.ff(player.getKolor());
+    }
 }

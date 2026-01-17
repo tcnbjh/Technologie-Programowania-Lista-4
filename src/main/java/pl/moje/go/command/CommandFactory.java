@@ -23,6 +23,8 @@ public class CommandFactory {
                 }
             }
             case Protocol.CMD_EXIT -> new ExitCommand();
+            case Protocol.CMD_PASS -> new PassCommand();
+            case Protocol.CMD_FF -> new FFCommand();
             default -> new InvalidCommand("Nieznana komenda");
         };
     }
