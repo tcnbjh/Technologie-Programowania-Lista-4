@@ -49,8 +49,10 @@ public class StonePainter {
                 switch (fields[r][c]){
                     case Kolor.DEAD_BLACK:
                         fields[r][c] = Kolor.BLACK;
+                        break;
                     case Kolor.DEAD_WHITE:
                         fields[r][c] = Kolor.WHITE;
+                        break;
                     default:
                         break;
                 }

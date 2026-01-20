@@ -58,12 +58,16 @@ public class GameController {
     }
 
     public synchronized void confirm(Kolor kolorGracza){
-        if(kolorGracza != turn || pass_turn != 1){
+        if(kolorGracza != turn) {
             return;
         }
 
-        pass_turn = 1;
-        gameEnd();
+        if (pass_turn == 0) {
+            pass_turn = 1;
+            turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+        } else if (pass_turn == 1) {
+            gameEnd();
+        }
     }
 
     public synchronized void reject(Kolor kolorGracza){
@@ -75,5 +79,6 @@ public class GameController {
         passCounter = 0;
         deadStonesCollecting = false;
         board.setDeadToAlive();
+        turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
     }
 }

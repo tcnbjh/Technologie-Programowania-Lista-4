@@ -57,12 +57,12 @@ public class GameClient extends Thread {
                     // +1 bo pierwszy element (indeks 0) to numer wiersza
                     if (x + 1 < parts.length) {
                         String symbol = parts[x + 1];
-                        if (symbol.equals("B")) {
-                            board[y][x] = Kolor.BLACK;
-                        } else if (symbol.equals("W")) {
-                            board[y][x] = Kolor.WHITE;
-                        } else {
-                            board[y][x] = Kolor.NONE;
+                        switch (symbol) {
+                            case "B": board[y][x] = Kolor.BLACK; break;
+                            case "W": board[y][x] = Kolor.WHITE; break;
+                            case "b": board[y][x] = Kolor.DEAD_BLACK; break;
+                            case "w": board[y][x] = Kolor.DEAD_WHITE; break;
+                            default: board[y][x] = Kolor.NONE; break;
                         }
                     }
                 }
@@ -95,6 +95,16 @@ public class GameClient extends Thread {
     public void sendSurrender() {
         out.println(Protocol.CMD_FF);
         updateStatus("Poddajesz grę.");
+    }
+
+    public void sendConfirm() {
+        out.println(Protocol.CMD_CONFIRM);
+        updateStatus("Akceptujesz układ.");
+    }
+
+    public void sendReject() {
+        out.println(Protocol.CMD_REJECT);
+        updateStatus("Odrzucasz układ. Wznowienie gry.");
     }
 
     public void updateStatus(String text) {

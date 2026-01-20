@@ -47,6 +47,14 @@ public class GoFrame extends Frame {
             if (client != null) client.sendSurrender();
         });
 
+        btnAccept.addActionListener(e -> {
+            if (client != null) client.sendConfirm();
+        });
+
+        btnReject.addActionListener(e -> {
+            if (client != null) client.sendReject();
+        });
+
         sidePanel.add(btnPass);
         sidePanel.add(btnSurrender);
         sidePanel.add(btnAccept);

@@ -25,6 +25,8 @@ public class CommandFactory {
             case Protocol.CMD_EXIT -> new ExitCommand();
             case Protocol.CMD_PASS -> new PassCommand();
             case Protocol.CMD_FF -> new FFCommand();
+            case Protocol.CMD_CONFIRM ->  new ConfirmCommand();
+            case Protocol.CMD_REJECT ->  new RejectCommand();
             default -> new InvalidCommand("Nieznana komenda");
         };
     }

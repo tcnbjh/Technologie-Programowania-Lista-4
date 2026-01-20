@@ -7,6 +7,8 @@ public class Protocol {
     public static final String CMD_EXIT = "EXIT";
     public static final String CMD_PASS = "PASS";
     public static final String CMD_FF = "FF";
+    public static final String CMD_CONFIRM = "CONFIRM";
+    public static final String CMD_REJECT = "REJECT";
 
     public static final String MSG_FULL = "FULL";
     public static final String MSG_BYE = "BYE";

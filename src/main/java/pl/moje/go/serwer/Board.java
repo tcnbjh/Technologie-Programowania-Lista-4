@@ -65,12 +65,16 @@ public class Board {
         switch (color) {
             case Kolor.BLACK:
                 painter.setGroupColorTo(Kolor.DEAD_BLACK, x, y, fields);
+                break;
             case Kolor.DEAD_BLACK:
                 painter.setGroupColorTo(Kolor.BLACK, x, y, fields);
+                break;
             case Kolor.DEAD_WHITE:
                 painter.setGroupColorTo(Kolor.WHITE, x, y, fields);
+                break;
             case Kolor.WHITE:
                 painter.setGroupColorTo(Kolor.DEAD_WHITE, x, y, fields);
+                break;
             default:
                 break;
         }
@@ -105,6 +109,8 @@ public class Board {
                 switch (k){
                     case BLACK -> c = 'B';
                     case WHITE -> c = 'W';
+                    case DEAD_BLACK -> c = 'b';
+                    case DEAD_WHITE -> c = 'w';
                     default -> c = '□';
                 }
 

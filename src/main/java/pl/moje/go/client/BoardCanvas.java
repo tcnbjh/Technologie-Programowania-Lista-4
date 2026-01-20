@@ -102,14 +102,26 @@ public class BoardCanvas extends Canvas {
                 int cy = offset + y * cell;
                 int r = cell * 9 / 20; // Promień kamienia (trochę mniejszy niż pół kratki)
 
-                if (k == Kolor.BLACK) {
+                if (k == Kolor.BLACK || k == Kolor.DEAD_BLACK) {
                     g.setColor(Color.BLACK);
                     g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
-                } else {
+
+                    if (k == Kolor.DEAD_BLACK) {
+                        g.setColor(Color.RED);
+                        g.drawLine(cx - r/2, cy - r/2, cx + r/2, cy + r/2);
+                        g.drawLine(cx + r/2, cy - r/2, cx - r/2, cy + r/2);
+                    }
+                } else if (k == Kolor.WHITE || k == Kolor.DEAD_WHITE) {
                     g.setColor(Color.WHITE);
                     g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
                     g.setColor(Color.BLACK); // Obwódka dla białego kamienia
                     g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
+
+                    if (k == Kolor.DEAD_WHITE) {
+                        g.setColor(Color.RED);
+                        g.drawLine(cx - r/2, cy - r/2, cx + r/2, cy + r/2);
+                        g.drawLine(cx + r/2, cy - r/2, cx - r/2, cy + r/2);
+                    }
                 }
             }
         }
