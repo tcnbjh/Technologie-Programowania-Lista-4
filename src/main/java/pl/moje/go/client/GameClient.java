@@ -1,10 +1,8 @@
 package pl.moje.go.client;
 
-import static pl.moje.go.common.Protocol.*;
-
+import java.awt.*;
 import java.io.*;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.*;
 
 public class GameClient {
 
@@ -15,126 +13,90 @@ public class GameClient {
     private BufferedReader in;
     private PrintWriter out;
 
-    private boolean connected = false;
+    private BoardCanvas boardCanvas;
+    private java.awt.TextArea messages;
 
-    private volatile boolean running;
-
-    public GameClient(String host, int port){
+    public GameClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
-    public void connect(){
-        try{
+    public void setBoardCanvas(BoardCanvas boardCanvas) {
+        this.boardCanvas = boardCanvas;
+    }
+
+    public void setMessages(java.awt.TextArea messages) {
+        this.messages = messages;
+    }
+
+    public void start() {
+        try {
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            out = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("Połączono z serwerem " + host + ":" + port);
+            String line;
+            while ((line = in.readLine()) != null) {
+                handleServerMessage(line);
+            }
 
-            String firstLine = in.readLine();
+        } catch (IOException e) {
+            appendMessage("Błąd połączenia z serwerem");
+        }
+    }
 
-            if (firstLine == null){
-                System.out.println("Serwer rozlaczyl sie od razu");
-                close();
+    public void sendMove(int x, int y) {
+        if (out != null) {
+            out.println("MOVE " + x + " " + y);
+        }
+    }
+
+    private void handleServerMessage(String firstLine) {
+        // ASCII board zaczyna się od linii z numerami kolumn
+        if (firstLine.contains("0") && firstLine.contains("1") && firstLine.contains("18")) { //poprawka
+            StringBuilder asciiBoard = new StringBuilder();
+            asciiBoard.append(firstLine).append("\n");
+
+            try {
+                for (int i = 0; i < 19; i++) {
+                    asciiBoard.append(in.readLine()).append("\n");
+                }
+            } catch (IOException e) {
                 return;
             }
 
-            if (MSG_FULL.equals(firstLine)){
-                System.out.println("Serwer: gra jest pełna");
-                close();
-                return;
-            }
-
-            System.out.println(firstLine);
-
-            connected = true;
-
-
-
-        } catch (IOException e){
-            System.out.println("Nie udalo sie polaczyc z serwerem: " + e.getMessage());
+            int[][] board = parseAsciiBoard(asciiBoard.toString());
+            EventQueue.invokeLater(() -> boardCanvas.updateBoard(board)); //poprawka
+        } else {
+            appendMessage(firstLine);
         }
     }
 
-    public void sendLine(String line){
-        out.println(line);
-    }
+    private int[][] parseAsciiBoard(String ascii) {
+        int[][] board = new int[19][19];
+        String[] lines = ascii.split("\n");
 
-    public String readLine(){
-        try{
-            return in.readLine();
-        } catch (IOException e){
-            return null;
+        // linia 0 = nagłówek z numerami kolumn
+        for (int y = 1; y <= 19; y++) {
+            String line = lines[y];
+            int x = 0;
+
+            for (int i = 0; i < line.length(); i++) {
+                char c = line.charAt(i);
+
+                if (c == 'X') board[y - 1][x++] = 1;
+                else if (c == 'O') board[y - 1][x++] = 2;
+                else if (c == '.') board[y - 1][x++] = 0;
+
+                if (x == 19) break;
+            }
         }
+        return board;
     }
 
-    public void close(){
-        try{
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-        } catch (IOException eignore){}
-
-        connected = false;
-    }
-
-    public void runInteractive(){
-        if (!connected){
-            System.out.println("Nie polaczono z serwerem.");
-            return;
-        }
-
-        running = true;
-
-        Thread receiver = new Thread(() -> {
-            try{
-                while (running){
-                    String line = readLine();
-                    if (line == null){
-                        System.out.println("Polacznie z serwerem zostalo przerwane");
-                        running = false;
-                        break;
-                    }
-
-                    if (BOARD_BEGIN.equals(line)){
-                        System.out.println("Aktualna plansza:");
-                        while (true){
-                            String boardLine = readLine();
-                            if (boardLine == null){
-                                System.out.println("Polacznie z serwerem zostalo przerwane");
-                                running = false;
-                                return;
-                            }
-                            if (BOARD_END.equals(boardLine)){
-                                break;
-                            }
-                            System.out.println(boardLine);
-                        }
-                    } else {
-                        System.out.println("Serwer: " + line);
-                    }
-                }
-            } catch (Exception e) {
-                if (running){
-                    System.out.println("Blad podczas odbierania danych: " + e.getMessage());
-                }
-            }
-        });
-
-        receiver.setDaemon(true);
-        receiver.start();
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (running){
-                String input = scanner.nextLine();
-                sendLine(input);
-
-                if (CMD_EXIT.equals(input)){
-                    running = false;
-                    break;
-                }
-            }
+    private void appendMessage(String msg) {
+        if (messages != null) {
+            messages.append(msg + "\n");
         }
     }
 }
