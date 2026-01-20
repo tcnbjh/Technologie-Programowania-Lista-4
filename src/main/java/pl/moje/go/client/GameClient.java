@@ -30,7 +30,7 @@ public class GameClient extends Thread {
                 handleMessage(msg);
             }
         } catch (IOException e) {
-            System.out.println("Połączenie przerwane: " + e.getMessage());
+            updateStatus("Rozłączono z serwerem.");
             e.printStackTrace();
         }
     }
@@ -71,21 +71,33 @@ public class GameClient extends Thread {
             // 3. Konsumuj znacznik końca planszy (END_BOARD), aby nie zakłócił pętli głównej
             in.readLine();
 
-            // Odśwież GUI w wątku Swinga/AWT
+            // Odśwież GUI w AWT
             EventQueue.invokeLater(() -> frame.updateBoard(board));
 
-        } else if (msg.startsWith("ERROR")) {
-            System.out.println("Błąd serwera: " + msg);
-        } else if (msg.equals(Protocol.MSG_MOVE_INVALID)) {
-            System.out.println("Ruch niepoprawny!");
+        } else {
+            updateStatus(msg);
         }
     }
 
     public void sendMove(int x, int y) {
-        out.println(Protocol.CMD_MOVE + " " + x + " " + y); //
+        out.println(Protocol.CMD_MOVE + " " + x + " " + y);
     }
 
     public void sendExit() {
         out.println(Protocol.CMD_EXIT);
+    }
+
+    public void sendPass() {
+        out.println(Protocol.CMD_PASS);
+        updateStatus("Pasujesz.");
+    }
+
+    public void sendSurrender() {
+        out.println(Protocol.CMD_FF);
+        updateStatus("Poddajesz grę.");
+    }
+
+    public void updateStatus(String text) {
+        EventQueue.invokeLater(() -> frame.setMessage(text));
     }
 }
