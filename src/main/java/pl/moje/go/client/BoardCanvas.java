@@ -1,90 +1,124 @@
 package pl.moje.go.client;
 
+import pl.moje.go.common.Kolor;
+
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class BoardCanvas extends Canvas {
 
-    public static final int SIZE = 19;
-    public static final int CELL = 30;
+    private final int size;
+    private Kolor[][] board;
+    private GameClient client;
 
-    private int[][] board = new int[SIZE][SIZE];
-    private final GameClient client;
+    private int cell;
+    private int offset;
 
-    public BoardCanvas(GameClient client) {
-        this.client = client;
-        setSize(SIZE * CELL, SIZE * CELL);
-        setBackground(new Color(222, 184, 135)); // kolor drewna
+    public BoardCanvas(int size) {
+        this.size = size;
+        this.board = new Kolor[size][size];
+        clearBoard();
+
+        setBackground(new Color(220, 179, 92)); // Kolor drewna (Goban)
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int x = e.getX() / CELL;
-                int y = e.getY() / CELL;
-
-                if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
-                    client.sendMove(x, y);
-                }
+                handleClick(e.getX(), e.getY());
             }
         });
     }
 
-    public void updateBoard(int[][] newBoard) {
-        this.board = newBoard;
+    public void setClient(GameClient client) {
+        this.client = client;
+    }
+
+    public void setBoard(Kolor[][] board) {
+        this.board = board;
         repaint();
+    }
+
+    private void clearBoard() {
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+                board[y][x] = Kolor.NONE;
+    }
+
+    private void updateGeometry() {
+        // Obliczamy rozmiar komórki tak, aby plansza mieściła się w oknie z marginesem
+        int minDym = Math.min(getWidth(), getHeight());
+        cell = minDym / (size + 1);
+        offset = cell; // Margines równy jednej kratce
+    }
+
+    private void handleClick(int mx, int my) {
+        if (client == null) return;
+        updateGeometry();
+
+        // Prosta matematyka do znalezienia najbliższego przecięcia
+        // Dodajemy 0.5 (czyli cell/2) przed dzieleniem dla zaokrąglenia (round logic)
+        float fx = (float)(mx - offset) / cell;
+        float fy = (float)(my - offset) / cell;
+
+        int x = Math.round(fx);
+        int y = Math.round(fy);
+
+        if (x >= 0 && x < size && y >= 0 && y < size) {
+            client.sendMove(y, x);
+        }
     }
 
     @Override
     public void paint(Graphics g) {
-        // 1️⃣ wyczyść tło
-        g.setColor(getBackground());
-        g.fillRect(0, 0, getWidth(), getHeight());
+        updateGeometry();
 
-        drawGrid(g);
-        drawStones(g);
-    }
-
-    private void drawGrid(Graphics g) {
+        // Rysowanie linii siatki
         g.setColor(Color.BLACK);
-
-        for (int i = 0; i < SIZE; i++) {
-            g.drawLine(
-                    CELL / 2,
-                    CELL / 2 + i * CELL,
-                    CELL / 2 + (SIZE - 1) * CELL,
-                    CELL / 2 + i * CELL
-            );
-
-            g.drawLine(
-                    CELL / 2 + i * CELL,
-                    CELL / 2,
-                    CELL / 2 + i * CELL,
-                    CELL / 2 + (SIZE - 1) * CELL
-            );
+        for (int i = 0; i < size; i++) {
+            int p = offset + i * cell;
+            // Linie pionowe
+            g.drawLine(offset + i * cell, offset, offset + i * cell, offset + (size - 1) * cell);
+            // Linie poziome
+            g.drawLine(offset, p, offset + (size - 1) * cell, p);
         }
-    }
 
-    private void drawStones(Graphics g) {
-        for (int y = 0; y < SIZE; y++) {
-            for (int x = 0; x < SIZE; x++) {
-                if (board[y][x] == 0) continue;
+        // Rysowanie kropek (hoshi) - opcjonalne, ale pomocne na planszy 19x19
+        if (size == 19) {
+            drawHoshi(g, 3, 3);
+            drawHoshi(g, 15, 3);
+            drawHoshi(g, 3, 15);
+            drawHoshi(g, 15, 15);
+            drawHoshi(g, 9, 9);
+        }
 
-                int px = x * CELL + 4;
-                int py = y * CELL + 4;
-                int size = CELL - 8;
+        // Rysowanie kamieni
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                Kolor k = board[y][x];
+                if (k == Kolor.NONE) continue;
 
-                if (board[y][x] == 1) {
-                    // czarny kamień
+                int cx = offset + x * cell;
+                int cy = offset + y * cell;
+                int r = cell * 9 / 20; // Promień kamienia (trochę mniejszy niż pół kratki)
+
+                if (k == Kolor.BLACK) {
                     g.setColor(Color.BLACK);
-                    g.fillOval(px, py, size, size);
+                    g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
                 } else {
-                    // biały kamień (Z OBRYSEM)
                     g.setColor(Color.WHITE);
-                    g.fillOval(px, py, size, size);
-                    g.setColor(Color.BLACK);
-                    g.drawOval(px, py, size, size);
+                    g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
+                    g.setColor(Color.BLACK); // Obwódka dla białego kamienia
+                    g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
                 }
             }
         }
+    }
+
+    private void drawHoshi(Graphics g, int x, int y) {
+        int cx = offset + x * cell;
+        int cy = offset + y * cell;
+        int r = 3;
+        g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
     }
 }

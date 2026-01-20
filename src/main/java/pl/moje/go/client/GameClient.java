@@ -1,102 +1,91 @@
 package pl.moje.go.client;
 
-import java.awt.*;
-import java.io.*;
-import java.net.*;
+import pl.moje.go.common.Kolor;
+import pl.moje.go.common.Protocol;
 
-public class GameClient {
+import java.awt.EventQueue;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-    private final String host;
-    private final int port;
+public class GameClient extends Thread {
 
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private final GoFrame frame;
+    private final BufferedReader in;
+    private final PrintWriter out;
+    private final int size;
 
-    private BoardCanvas boardCanvas;
-    private java.awt.TextArea messages;
-
-    public GameClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public GameClient(GoFrame frame, BufferedReader in, PrintWriter out, int size) {
+        this.frame = frame;
+        this.in = in;
+        this.out = out;
+        this.size = size;
     }
 
-    public void setBoardCanvas(BoardCanvas boardCanvas) {
-        this.boardCanvas = boardCanvas;
-    }
-
-    public void setMessages(java.awt.TextArea messages) {
-        this.messages = messages;
-    }
-
-    public void start() {
+    @Override
+    public void run() {
         try {
-            socket = new Socket(host, port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            String msg;
+            while ((msg = in.readLine()) != null) {
+                handleMessage(msg);
+            }
+        } catch (IOException e) {
+            System.out.println("Połączenie przerwane: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-            String line;
-            while ((line = in.readLine()) != null) {
-                handleServerMessage(line);
+    private void handleMessage(String msg) throws IOException {
+        if (msg.equals(Protocol.BOARD_BEGIN)) { //
+
+            Kolor[][] board = new Kolor[size][size];
+
+            // 1. Pomiń linię nagłówka (numery kolumn: "   0 1 2 ...")
+            in.readLine();
+
+            // 2. Czytaj wiersze planszy
+            for (int y = 0; y < size; y++) {
+                String line = in.readLine();
+                if (line == null) break;
+
+                // Dzielimy linię po białych znakach (spacjach)
+                // Linia wygląda np. tak: " 0 □ □ B W ..."
+                // parts[0] to numer wiersza, parts[1] to pierwszy kamień
+                String[] parts = line.trim().split("\\s+");
+
+                for (int x = 0; x < size; x++) {
+                    // +1 bo pierwszy element (indeks 0) to numer wiersza
+                    if (x + 1 < parts.length) {
+                        String symbol = parts[x + 1];
+                        if (symbol.equals("B")) {
+                            board[y][x] = Kolor.BLACK;
+                        } else if (symbol.equals("W")) {
+                            board[y][x] = Kolor.WHITE;
+                        } else {
+                            board[y][x] = Kolor.NONE;
+                        }
+                    }
+                }
             }
 
-        } catch (IOException e) {
-            appendMessage("Błąd połączenia z serwerem");
+            // 3. Konsumuj znacznik końca planszy (END_BOARD), aby nie zakłócił pętli głównej
+            in.readLine();
+
+            // Odśwież GUI w wątku Swinga/AWT
+            EventQueue.invokeLater(() -> frame.updateBoard(board));
+
+        } else if (msg.startsWith("ERROR")) {
+            System.out.println("Błąd serwera: " + msg);
+        } else if (msg.equals(Protocol.MSG_MOVE_INVALID)) {
+            System.out.println("Ruch niepoprawny!");
         }
     }
 
     public void sendMove(int x, int y) {
-        if (out != null) {
-            out.println("MOVE " + x + " " + y);
-        }
+        out.println(Protocol.CMD_MOVE + " " + x + " " + y); //
     }
 
-    private void handleServerMessage(String firstLine) {
-        // ASCII board zaczyna się od linii z numerami kolumn
-        if (firstLine.contains("0") && firstLine.contains("1") && firstLine.contains("18")) { //poprawka
-            StringBuilder asciiBoard = new StringBuilder();
-            asciiBoard.append(firstLine).append("\n");
-
-            try {
-                for (int i = 0; i < 19; i++) {
-                    asciiBoard.append(in.readLine()).append("\n");
-                }
-            } catch (IOException e) {
-                return;
-            }
-
-            int[][] board = parseAsciiBoard(asciiBoard.toString());
-            EventQueue.invokeLater(() -> boardCanvas.updateBoard(board)); //poprawka
-        } else {
-            appendMessage(firstLine);
-        }
-    }
-
-    private int[][] parseAsciiBoard(String ascii) {
-        int[][] board = new int[19][19];
-        String[] lines = ascii.split("\n");
-
-        // linia 0 = nagłówek z numerami kolumn
-        for (int y = 1; y <= 19; y++) {
-            String line = lines[y];
-            int x = 0;
-
-            for (int i = 0; i < line.length(); i++) {
-                char c = line.charAt(i);
-
-                if (c == 'X') board[y - 1][x++] = 1;
-                else if (c == 'O') board[y - 1][x++] = 2;
-                else if (c == '.') board[y - 1][x++] = 0;
-
-                if (x == 19) break;
-            }
-        }
-        return board;
-    }
-
-    private void appendMessage(String msg) {
-        if (messages != null) {
-            messages.append(msg + "\n");
-        }
+    public void sendExit() {
+        out.println(Protocol.CMD_EXIT);
     }
 }
