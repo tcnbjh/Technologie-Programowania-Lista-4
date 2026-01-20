@@ -10,6 +10,7 @@ public class Board {
     private final Kolor[][] fields;
     private final MoveValidator validator = new MoveValidator();
     private final StoneRemover remover = new StoneRemover();
+    private final StonePainter painter = new StonePainter();
 
     Board() {
         fields = new Kolor[size][size];
@@ -59,6 +60,23 @@ public class Board {
         return validator;
     }
 
+    public void setDeadGroup(int x, int y){
+        Kolor color = fields[x][y];
+        switch (color) {
+            case Kolor.BLACK:
+                painter.setGroupColorTo(Kolor.DEAD_BLACK, x, y, fields);
+            case Kolor.DEAD_BLACK:
+                painter.setGroupColorTo(Kolor.BLACK, x, y, fields);
+            case Kolor.DEAD_WHITE:
+                painter.setGroupColorTo(Kolor.WHITE, x, y, fields);
+            case Kolor.WHITE:
+                painter.setGroupColorTo(Kolor.DEAD_WHITE, x, y, fields);
+            default:
+                break;
+        }
+    }
+
+
 
     private void setField(int x, int y, Kolor color){
         fields[x][y] = color;
@@ -99,6 +117,10 @@ public class Board {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public void setDeadToAlive(){
+        painter.setToAlive(fields);
     }
 
 }

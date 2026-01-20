@@ -21,13 +21,17 @@ public class MoveValidator {
         if(color == Kolor.WHITE){
             for(int[] pair : wBlocked){
                 if(x == pair[0] && y == pair[1]){
-                    return false;
+                    if(!koRule(x, y, Kolor.BLACK, fields)){
+                        return false;
+                    }
                 }
             }
         } else {
             for(int[] pair : bBlocked){
                 if(x == pair[0] && y == pair[1]){
-                    return false;
+                    if(!koRule(x, y, Kolor.WHITE, fields)){
+                        return false;
+                    }
                 }
             }
         }
@@ -154,5 +158,70 @@ public class MoveValidator {
         } else {
             wBlocked.add(new int[]{x, y});
         }
+    }
+
+    private boolean koRule(int x, int y, Kolor color, Kolor[][] fields){
+        int n = fields.length;
+
+        for (int[] d : DIRS) {
+            int nx = x + d[0];
+            int ny = y + d[1];
+
+            if (nx >= 0 && nx < n && ny >= 0 && ny < n) {
+                if (fields[nx][ny] == color) {
+                    if(chainAroundBreathsKO(fields, nx, ny)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean chainAroundBreathsKO(Kolor[][] fields, int x, int y) {
+        int n = fields.length;
+
+        Kolor color = fields[x][y];
+        if (color == Kolor.NONE) return false;
+
+        boolean[][] visited = new boolean[n][n];      // kamienie grupy
+        boolean[][] libertySeen = new boolean[n][n];  // puste pola (oddechy)
+        ArrayDeque<int[]> stack = new ArrayDeque<>(); // stos na kolejne pola do sprawdzenia
+
+        visited[x][y] = true; // ustawienie odwiedzenia poczatkowego pola na true
+        stack.push(new int[]{x, y}); // dodanie poczatkowego pola na stos
+
+        int lenght = 1;
+        int liberties = 0;
+
+        while (!stack.isEmpty()) {
+            int[] p = stack.pop(); // sciaga ze stosu i zwraca wartosc
+            int cx = p[0], cy = p[1];
+
+            for (int[] d : DIRS) {
+                int nx = cx + d[0];
+                int ny = cy + d[1];
+
+                if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue; // poza plansza
+
+                Kolor k = fields[nx][ny];
+
+                if (k == Kolor.NONE) {
+                    if (!libertySeen[nx][ny]) {
+                        libertySeen[nx][ny] = true;
+                        liberties++;
+                    }
+                } else if (k == color && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
+                    stack.push(new int[]{nx, ny});// dodanie nowego pola do odwiedzenia na stos
+                    lenght++;
+                }
+            }
+        }
+
+        if(liberties == 1 && lenght >= 2) {
+            return true;
+        }
+        return false;
     }
 }

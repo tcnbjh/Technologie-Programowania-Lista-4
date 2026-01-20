@@ -47,4 +47,12 @@ public class GameSession {
     public synchronized void ff(Player player){
         gameController.ff(player.getKolor());
     }
+
+    public synchronized void confirm(Player player){
+        gameController.confirm(player.getKolor());
+    }
+
+    public synchronized void reject(Player player){
+        gameController.reject(player.getKolor());
+    }
 }
