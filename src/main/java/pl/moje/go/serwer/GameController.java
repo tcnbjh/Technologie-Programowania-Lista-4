@@ -9,6 +9,8 @@ public class GameController {
     int pass_turn = 0;
     private Kolor gameWinner;
     private boolean deadStonesCollecting = false;
+    private double blackPoints = 0;
+    private double whitePoints = 6.5;
 
     public synchronized boolean makeMove(int x, int y, Kolor kolorGracza) {
         if (kolorGracza != turn){
@@ -16,13 +18,18 @@ public class GameController {
         }
 
         if(!deadStonesCollecting) {
-            if (!board.placeStone(x, y, kolorGracza)) {
+            int capt = board.placeStone(x, y, kolorGracza);
+            if (capt == -1) {
                 return false;
             }
 
-            Kolor opponent = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+            if(turn == Kolor.BLACK){
+                blackPoints += capt;
+            } else{
+                whitePoints += capt;
+            }
 
-            turn = opponent;
+            turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
             passCounter = 0;
             return true;
         } else{
@@ -46,7 +53,6 @@ public class GameController {
         }
     }
 
-    private synchronized void gameEnd(){}
 
     public synchronized String boardSnapshotAscii(){
         return board.toAscii();
@@ -80,5 +86,21 @@ public class GameController {
         deadStonesCollecting = false;
         board.setDeadToAlive();
         turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+    }
+
+    private synchronized void gameEnd(){
+        int[] captured = board.removeDeadStones();
+        whitePoints += captured[0];
+        blackPoints += captured[1];
+
+        int[] Teritory = board.countTeritory();
+        whitePoints += Teritory[0];
+        blackPoints += Teritory[1];
+
+        if (blackPoints > whitePoints){
+            gameWinner = Kolor.BLACK;
+        } else {
+            gameWinner = Kolor.WHITE;
+        }
     }
 }

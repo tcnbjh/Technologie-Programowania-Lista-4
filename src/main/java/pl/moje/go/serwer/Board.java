@@ -11,6 +11,8 @@ public class Board {
     private final MoveValidator validator = new MoveValidator();
     private final StoneRemover remover = new StoneRemover();
     private final StonePainter painter = new StonePainter();
+    private final DeadStonesRemover dRemover = new DeadStonesRemover();
+    private final TeritoryCounter teritoryCounter = new TeritoryCounter();
 
     Board() {
         fields = new Kolor[size][size];
@@ -26,17 +28,17 @@ public class Board {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
 
-    public boolean placeStone(int x, int y, Kolor color) {
+    public int placeStone(int x, int y, Kolor color) {
         if (!isOnBoard(x, y)){
-            return false;
+            return -1;
         }
 
         if (fields[x][y] != Kolor.NONE){
-            return false;
+            return -1;
         }
 
         if(!validator.isValidMove(fields, x, y, color)){
-            return false;
+            return -1;
         }
 
         validator.clearBlocked(color);
@@ -53,7 +55,7 @@ public class Board {
             validator.setBlock(list.get(i), list.get(i+1), color);
         }
 
-        return true;
+        return list.get(dlg - 1);
     }
 
     public MoveValidator getValidator(){
@@ -125,8 +127,15 @@ public class Board {
         return sb.toString();
     }
 
+    public int[] removeDeadStones(){
+        return dRemover.removeDeadStones(fields);
+    }
+
     public void setDeadToAlive(){
         painter.setToAlive(fields);
     }
 
+    public int[] countTeritory(){
+        return teritoryCounter.count(fields);
+    }
 }
