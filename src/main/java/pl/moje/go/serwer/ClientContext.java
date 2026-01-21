@@ -2,6 +2,8 @@ package pl.moje.go.serwer;
 
 import java.io.PrintWriter;
 
+/** Dane klienta: sesja gry, gracz i kanał do wysyłania odpowiedzi. */
+
 public class ClientContext {
 
     private final GameSession session;

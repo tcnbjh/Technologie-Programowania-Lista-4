@@ -3,6 +3,12 @@ package pl.moje.go.serwer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Reprezentuje sesję gry na serwerze.
+ * Przechowuje podłączonych klientów (ClientHandler), zarządza rejestracją graczy
+ * oraz deleguje logikę rozgrywki do GameController.
+ * Odpowiada za rozsyłanie aktualnej planszy i komunikatów do wszystkich klientów.
+ */
 public class GameSession {
 
     private final List<ClientHandler> clients = new ArrayList<>();

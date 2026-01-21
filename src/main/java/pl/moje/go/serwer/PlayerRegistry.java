@@ -2,6 +2,8 @@ package pl.moje.go.serwer;
 
 import pl.moje.go.common.Kolor;
 
+/** Zarządza graczami : max 2, przydział koloru i generowanie ID. */
+
 public class PlayerRegistry {
     private Player[] players = new Player[2];
     private int nextId = 0;
@@ -10,6 +12,9 @@ public class PlayerRegistry {
         return players[0] != null && players[1] != null;
     }
 
+    /**
+     * Metoda zwraca pierwszy dostepny kolor
+     */
     public Kolor getAvailableColor(){
         if (players[0] == null){
             return Kolor.BLACK;
@@ -28,6 +33,10 @@ public class PlayerRegistry {
         }
     }
 
+    /**
+     * rejestruje nowego gracza
+     * @return zwraca czy udalo sie zarejestrowac nowego gracza
+     */
     public synchronized Player registerNewPlayer(){
         if (isFull()){
             return null;
@@ -39,6 +48,10 @@ public class PlayerRegistry {
         }
     }
 
+    /**
+     * Usuwa gracza z rejestru.
+     * @param player gracz
+     */
     public synchronized void removePlayer(Player player){
         if (player == players[0]){
             players[0] = null;

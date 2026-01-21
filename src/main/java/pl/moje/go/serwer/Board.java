@@ -4,6 +4,12 @@ import pl.moje.go.common.Kolor;
 import java.util.ArrayList;
 
 
+/**
+ * Klasa przechowuje informacje o aktualnym stanie planszy (19x19).
+ * Logikę sprawdzania ruchu, zdejmowania kamieni, oznaczania grup jako martwe
+ * oraz liczenia terytorium deleguje do osobnych klas pomocniczych.
+ */
+
 public class Board {
 
     private final int size = 19;
@@ -14,6 +20,9 @@ public class Board {
     private final DeadStonesRemover dRemover = new DeadStonesRemover();
     private final TeritoryCounter teritoryCounter = new TeritoryCounter();
 
+    /**
+     * Konstruktor tworzy pustą plansze o wymiarze 19x19
+     */
     Board() {
         fields = new Kolor[size][size];
 
@@ -24,10 +33,23 @@ public class Board {
         }
     }
 
+    /**
+     * sprawdza czy podana pozycja jest na planszy
+     * @param x
+     * @param y
+     * @return
+     */
     private boolean isOnBoard(int x, int y) {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
 
+    /**
+     * Próbuje postawic kamień na podanej pozycji
+     * @param x
+     * @param y
+     * @param color kolor gracza ktory wykonuje ruch
+     * @return zwraca ilosc potencjalnie zbitych kamieni przeciwnika
+     */
     public int placeStone(int x, int y, Kolor color) {
         if (!isOnBoard(x, y)){
             return -1;
@@ -58,10 +80,20 @@ public class Board {
         return list.get(dlg - 1);
     }
 
+    /**
+     * Zwraca obiekt klasy MoveValidator by moc w kontrolerze wyczyscic tablice wewnetrzna obiektu
+     * @return zwraca obiekt klasy MoveValidator
+     */
     public MoveValidator getValidator(){
         return validator;
     }
 
+    /**
+     * Metoda delegująca obiekt klasy StonePainter do zmiany koloru grupy na podanej pozycji
+     * na ten sam ale martwy kolor
+     * @param x
+     * @param y
+     */
     public void setDeadGroup(int x, int y){
         Kolor color = fields[x][y];
         switch (color) {
@@ -127,14 +159,25 @@ public class Board {
         return sb.toString();
     }
 
+    /**
+     * Metoda delegujaca obiekt klasy DeadStonesRemover do usuniecia martwych kamieni z planszy
+     * @return zwraca tablice z liczbami zebranych martwych kamieni z planszy
+     */
     public int[] removeDeadStones(){
         return dRemover.removeDeadStones(fields);
     }
 
+    /**
+     * Metoda delegujaca obiekt klasy StonePainter do przemienienia wszystkich martwych kamieni na żywe
+     */
     public void setDeadToAlive(){
         painter.setToAlive(fields);
     }
 
+    /**
+     * Metoda delegujaca obiekt klasy TeritoryCounter do usuniecia martwych kamieni z planszy
+     * @return zwraca tablice z liczbami pustych pol na planszy otoczonych tylko przez kamienie jednego koloru
+     */
     public int[] countTeritory(){
         return teritoryCounter.count(fields);
     }

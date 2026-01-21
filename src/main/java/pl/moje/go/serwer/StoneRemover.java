@@ -5,12 +5,22 @@ import pl.moje.go.common.Kolor;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
+/**
+ * Klasa pomocnicza do zdejmowania zbitych kamieni.
+ * Po wykonaniu ruchu sprawdza sąsiednie grupy przeciwnika, liczy ich oddechy
+ * i usuwa z planszy grupy bez oddechów (zbijane).
+ */
+
 public class StoneRemover {
 
     private static final int[][] DIRS = {{1,0},{-1,0},{0,1},{0,-1}};
 
     StoneRemover(){}
 
+    /**
+     * Metoda sprawdza łancuchy wokół pola i wywołuje ich ewentualne usuniecie
+     * @return zwraca talblice z zablokowanymi polami i sume zbitych kamieni
+     */
     public ArrayList<Integer> removeAround(int x, int y, Kolor[][] fields, Kolor color){
         ArrayList<Integer> list = new ArrayList<>();
         int sum_cap = 0;
@@ -36,6 +46,13 @@ public class StoneRemover {
         return list;
     }
 
+    /**
+     * Metoda usuwa grupe kamieni
+     * @param x x
+     * @param y y
+     * @param fields aktualna plansza
+     * @return zwraca ilosc zbitych kamieni
+     */
     int numbOfCaptured(int x, int y, Kolor[][] fields, Kolor color){
         int n = fields.length;
 

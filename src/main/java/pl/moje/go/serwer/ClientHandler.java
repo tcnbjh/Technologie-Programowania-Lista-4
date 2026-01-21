@@ -9,6 +9,8 @@ import java.io.*;
 
 import static  pl.moje.go.common.Protocol.*;
 
+/** Wątek obsługi klienta: odbiera komendy z socketu i wysyła wiadomości/stan planszy. */
+
 public class ClientHandler implements Runnable {
 
     private final Socket socket;

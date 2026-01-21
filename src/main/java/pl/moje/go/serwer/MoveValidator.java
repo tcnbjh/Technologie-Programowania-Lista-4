@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 import pl.moje.go.common.Kolor;
 
+/**
+ * Sprawdza poprawność ruchu w grze Go.
+ * Weryfikuje m.in. oddechy (liberties), zakaz samobójstwa, możliwość bicia
+ * oraz prostą regułę KO na podstawie list zablokowanych pól (wBlocked/bBlocked),
+ * które są aktualizowane po wykonaniu ruchu.
+ */
 public class MoveValidator {
     private static final int[][] DIRS = {{1,0},{-1,0},{0,1},{0,-1}};
     ArrayList<int[]> wBlocked = new ArrayList<>();
@@ -12,6 +18,11 @@ public class MoveValidator {
 
     public MoveValidator(){}
 
+    /**
+     * sprawdza czy ruch jest poprawny
+     * @param fields aktualna plansza
+     * @return zwraca true gdy ruch jest poprawny
+     */
     public boolean isValidMove(Kolor[][] fields, int x, int y, Kolor color){
 
         if(haveBreath(x, y, fields)){
@@ -49,6 +60,9 @@ public class MoveValidator {
         return false;
     }
 
+    /**
+     * Metoda sprawdzajaca czy na podanej pozycji jest oddech
+     */
     private boolean haveBreath(int x, int y, Kolor[][] fields) {
         int n = fields.length;
 
@@ -66,6 +80,13 @@ public class MoveValidator {
     }
 
 
+    /**
+     * Metoda liczaca ilosc oddechow lancucha
+     * @param fields aktualna plansza
+     * @param x
+     * @param y
+     * @return ilosc oddechow
+     */
     private int countChainLiberties(Kolor[][] fields, int x, int y) {
         int n = fields.length;
 
@@ -108,6 +129,9 @@ public class MoveValidator {
         return liberties;
     }
 
+    /**
+     * Metoda sprawdzajaca czy istnieje lancuch obok z wiecej niz 1 oddechem
+     */
     private boolean chainsAroundBreaths(int x, int y, Kolor color, Kolor[][] fields){
         int n = fields.length;
 
@@ -126,6 +150,9 @@ public class MoveValidator {
         return false;
     }
 
+    /**
+     * Metoda sprawdzajaca czy istnieje lancuch obok z jednym oddechem
+     */
     private boolean enemyChainsBreaths(int x, int y, Kolor color, Kolor[][] fields){
         int n = fields.length;
 
@@ -144,6 +171,9 @@ public class MoveValidator {
         return false;
     }
 
+    /**
+     * czysci liste zablokowanych pol
+     */
     public void clearBlocked(Kolor color){
         if(color == Kolor.WHITE){
             bBlocked.clear();
@@ -152,6 +182,9 @@ public class MoveValidator {
         }
     }
 
+    /**
+     * ustawia blokade na polu
+     */
     public void setBlock(int x, int y, Kolor color){
         if(color == Kolor.WHITE){
             bBlocked.add(new int[]{x, y});
@@ -160,6 +193,9 @@ public class MoveValidator {
         }
     }
 
+    /**
+     *Metoda do potierdzenia czy na danym polu na pewno nie mozna postawic kamienia pomimo blokady ko
+     */
     private boolean koRule(int x, int y, Kolor color, Kolor[][] fields){
         int n = fields.length;
 
@@ -177,6 +213,7 @@ public class MoveValidator {
         }
         return false;
     }
+
 
     private boolean chainAroundBreathsKO(Kolor[][] fields, int x, int y) {
         int n = fields.length;

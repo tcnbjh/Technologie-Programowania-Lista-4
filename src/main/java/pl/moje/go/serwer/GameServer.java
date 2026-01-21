@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.ServerSocket;
 
+/** Serwer nasłuchujący na porcie: przyjmuje klientów, rejestruje graczy i uruchamia ClientHandler. */
+
 public class GameServer {
 
     private final int port;

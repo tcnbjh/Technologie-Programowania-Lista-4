@@ -1,5 +1,8 @@
 package pl.moje.go.common;
 
+
+/** Stałe protokołu komunikacji (komendy, odpowiedzi i znaczniki planszy). **/
+
 public class Protocol {
     private Protocol() {}
 

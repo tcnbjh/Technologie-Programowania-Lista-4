@@ -4,12 +4,24 @@ import pl.moje.go.common.Kolor;
 
 import java.util.ArrayDeque;
 
+/**
+ * Klasa pomocnicza do zmiany stanu kamieni na planszy.
+ * Umożliwia „pomalowanie” całej grupy (połączeni sąsiadami) na inny kolor,
+ * oraz przywrócenie wszystkich martwych kamieni do stanu żywego.
+ */
 public class StonePainter {
 
     private static final int[][] DIRS = {{1,0},{-1,0},{0,1},{0,-1}};
 
     StonePainter(){}
 
+    /**
+     * Zmienia kolor wszystkich kamieni w grupie na podany kolor
+     * @param paintColor
+     * @param x
+     * @param y
+     * @param fields
+     */
     public void setGroupColorTo(Kolor paintColor, int x, int y, Kolor[][] fields){
         int n = fields.length;
         Kolor color = fields[x][y];
@@ -43,6 +55,10 @@ public class StonePainter {
         }
     }
 
+    /**
+     * Przywracanie kamieni do żywych
+     * @param fields
+     */
     public void setToAlive(Kolor[][] fields){
         for (int r = 0; r < fields.length; r++) {
             for (int c = 0; c < fields.length; c++) {

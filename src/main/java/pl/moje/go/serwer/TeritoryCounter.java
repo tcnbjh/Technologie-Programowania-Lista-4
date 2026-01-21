@@ -4,6 +4,12 @@ import pl.moje.go.common.Kolor;
 
 import java.util.ArrayDeque;
 
+/**
+ * Licznik terytorium w grze Go.
+ * Wyszukuje spójne obszary pustych pól (NONE) i sprawdza, czy są otoczone
+ * wyłącznie przez kamienie jednego koloru. Jeśli tak, dodaje je do terytorium
+ * danego gracza.
+ */
 public class TeritoryCounter {
     TeritoryCounter(){}
 

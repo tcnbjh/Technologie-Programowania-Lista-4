@@ -3,6 +3,13 @@ package pl.moje.go.serwer;
 import pl.moje.go.common.Kolor;
 import pl.moje.go.common.Protocol;
 
+/**
+ * Kontroler logiki rozgrywki Go.
+ * Pilnuje kolejności tur, obsługuje ruchy, pass i poddanie (ff),
+ * przełącza tryb oznaczania martwych kamieni po dwóch passach
+ * oraz na koniec zlicza punkty (zbicia + terytorium + komi) i wyznacza zwycięzcę.
+ * Stan planszy i operacje na niej deleguje do klasy Board.
+ */
 public class GameController {
     private final Board board = new  Board();
     private Kolor turn = Kolor.BLACK;
@@ -43,6 +50,11 @@ public class GameController {
         }
     }
 
+
+    /**
+     * Pasuje turę (tylko gdy to tura gracza). Po dwóch passach wchodzi tryb oznaczania martwych kamieni.
+     * @param kolorGracza kolor gracza, który pasuje
+     */
     public synchronized void pass(Kolor kolorGracza){
         if(turn == kolorGracza && !deadStonesCollecting){
             passCounter += 1;
@@ -59,11 +71,21 @@ public class GameController {
         return board.toAscii();
     }
 
+    /**
+     * Poddanie gry przez gracza
+     * @param kolorGracza kolor gracza poddajacego gre
+     */
     public synchronized void ff(Kolor kolorGracza){
         gameWinner = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
-            gameEnd();
+        gameEnd();
     }
 
+    /**
+     * Potwierdzenia przez gracza proponowanych martwych kamieni
+     * lub zatwierdzenie martwych kamieni do zaproponowania
+     * @param kolorGracza
+     * @return
+     */
     public synchronized String confirm(Kolor kolorGracza){
         if(kolorGracza != turn) {
             return null;
@@ -79,6 +101,10 @@ public class GameController {
         return null;
     }
 
+    /**
+     * Metoda odpowiedzialna za odrzucenia proponowanych martwych kamieni
+     * @param kolorGracza kolor gracza odrzucajacego
+     */
     public synchronized void reject(Kolor kolorGracza){
         if(kolorGracza != turn || pass_turn != 1){
             return;
@@ -91,7 +117,15 @@ public class GameController {
         turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
     }
 
+    /**
+     * Metoda delegujaca do zliczenia punktów, zdecydowania zwyciezcy i wyslania wiadomosci o zwycieztwie
+     * @return
+     */
     private synchronized String gameEnd(){
+        if(gameWinner != null){
+            return Protocol.MSG_GAME_OVER + " " + gameWinner + " " + blackPoints + " " + whitePoints;
+        }
+
         int[] captured = board.removeDeadStones();
         whitePoints += captured[0];
         blackPoints += captured[1];
