@@ -1,6 +1,7 @@
 package pl.moje.go.serwer;
 
 import pl.moje.go.common.Kolor;
+import pl.moje.go.common.Protocol;
 
 public class GameController {
     private final Board board = new  Board();
@@ -63,17 +64,19 @@ public class GameController {
             gameEnd();
     }
 
-    public synchronized void confirm(Kolor kolorGracza){
+    public synchronized String confirm(Kolor kolorGracza){
         if(kolorGracza != turn) {
-            return;
+            return null;
         }
 
         if (pass_turn == 0) {
             pass_turn = 1;
             turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
+            return null;
         } else if (pass_turn == 1) {
-            gameEnd();
+            return gameEnd();
         }
+        return null;
     }
 
     public synchronized void reject(Kolor kolorGracza){
@@ -88,19 +91,22 @@ public class GameController {
         turn = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
     }
 
-    private synchronized void gameEnd(){
+    private synchronized String gameEnd(){
         int[] captured = board.removeDeadStones();
         whitePoints += captured[0];
         blackPoints += captured[1];
 
+
         int[] Teritory = board.countTeritory();
-        whitePoints += Teritory[0];
-        blackPoints += Teritory[1];
+        whitePoints += Teritory[1];
+        blackPoints += Teritory[0];
 
         if (blackPoints > whitePoints){
             gameWinner = Kolor.BLACK;
         } else {
             gameWinner = Kolor.WHITE;
         }
+
+        return Protocol.MSG_GAME_OVER + " " + gameWinner + " " + blackPoints + " " + whitePoints;
     }
 }

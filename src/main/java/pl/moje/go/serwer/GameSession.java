@@ -49,7 +49,14 @@ public class GameSession {
     }
 
     public synchronized void confirm(Player player){
-        gameController.confirm(player.getKolor());
+        String resultMsg = gameController.confirm(player.getKolor());
+
+        if (resultMsg != null){
+            for (ClientHandler handler : clients){
+                handler.sendMessage(resultMsg);
+            }
+        }
+        broadcastBoard();
     }
 
     public synchronized void reject(Player player){

@@ -31,6 +31,10 @@ public class ClientHandler implements Runnable {
         out.println(BOARD_END);
     }
 
+    public void sendMessage(String msg) {
+        out.println(msg);
+    }
+
     @Override
     public void run(){
         System.out.println("Obsługuje klienta w watku: " + Thread.currentThread().getName());

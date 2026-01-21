@@ -23,7 +23,7 @@ public class TeritoryCounter {
                     visited[y][x] = true;
                     if (fields[y][x] == Kolor.NONE) {
                         Kolor color = Kolor.NONE;
-                        int counter = 0;
+                        int counter = 1;
 
                         ArrayDeque<int[]> stack = new ArrayDeque<>();
 
@@ -52,7 +52,6 @@ public class TeritoryCounter {
                                         } else if(color != k && color != null){
                                             color = null;
                                         }
-                                        visited[nx][ny] = true;
                                     }
                                 }
                             }

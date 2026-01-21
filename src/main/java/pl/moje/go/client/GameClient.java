@@ -74,6 +74,23 @@ public class GameClient extends Thread {
             // Odśwież GUI w AWT
             EventQueue.invokeLater(() -> frame.updateBoard(board));
 
+        } else if (msg.startsWith(Protocol.MSG_GAME_OVER)) {
+            String[] parts = msg.split(" ");
+
+            String winner = parts[1];
+            String blackPts = parts[2];
+            String whitePts = parts[3];
+
+            String text = "Koniec gry!\n" +
+                    "Wygrał: " + winner + "\n\n" +
+                    "Punkty czarnego: " + blackPts + "\n" +
+                    "Punkty białego: " + whitePts;
+
+            EventQueue.invokeLater(() -> {
+                frame.setMessage("Koniec gry. Wygrał " + winner);
+                javax.swing.JOptionPane.showMessageDialog(frame, text, "Wynik", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            });
+
         } else {
             updateStatus(msg);
         }

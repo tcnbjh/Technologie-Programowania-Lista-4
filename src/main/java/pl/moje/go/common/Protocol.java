@@ -14,6 +14,7 @@ public class Protocol {
     public static final String MSG_BYE = "BYE";
     public static final String MSG_MOVE_OK = "Wykonano ruch";
     public static final String MSG_MOVE_INVALID = "Niepoprawny ruch";
+    public static final String MSG_GAME_OVER = "GAME_OVER";
 
     public static final String BOARD_BEGIN = "BOARD";
     public static final String BOARD_END = "END_BOARD";
