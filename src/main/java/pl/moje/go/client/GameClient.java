@@ -14,6 +14,7 @@ public class GameClient extends Thread {
     private final BufferedReader in;
     private final PrintWriter out;
     private final int size;
+    private Kolor myColor;
 
     public GameClient(GoFrame frame, BufferedReader in, PrintWriter out, int size) {
         this.frame = frame;
@@ -74,6 +75,29 @@ public class GameClient extends Thread {
             // Odśwież GUI w AWT
             EventQueue.invokeLater(() -> frame.updateBoard(board));
 
+        } else if (msg.startsWith("ID gracza:")) {
+            if (msg.contains("BLACK")) {
+                myColor = Kolor.BLACK;
+            } else {
+                myColor = Kolor.WHITE;
+            }
+            updateStatus("Jesteś graczem: " + myColor + ". Oczekiwanie na start...");
+            EventQueue.invokeLater(() -> frame.setTitle("Go - Gracz: " + myColor));
+        } else if (msg.startsWith(Protocol.MSG_TURN)) {
+            String parts[] = msg.split(" ");
+            String turnColorStr = parts[1];
+            Kolor turnColor = turnColorStr.equals("BLACK") ? Kolor.BLACK : Kolor.WHITE;
+
+            String statusText;
+
+            if (myColor == null) {
+                statusText = "Tura: " + turnColor;
+            } else if (turnColor == myColor) {
+                statusText = "TWÓJ RUCH (" + turnColor + ")...";
+            } else {
+                statusText = "Ruch przeciwnika (" + turnColor + ")...";
+            }
+            frame.setTurnInfo(statusText);
         } else if (msg.startsWith(Protocol.MSG_GAME_OVER)) {
             String[] parts = msg.split(" ");
 

@@ -1,5 +1,8 @@
 package pl.moje.go.serwer;
 
+import pl.moje.go.common.Kolor;
+import pl.moje.go.common.Protocol;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +36,10 @@ public class GameSession {
 
     public synchronized void broadcastBoard(){
         String ascii = gameController.boardSnapshotAscii();
+        Kolor currentTurn = gameController.getCurrentTurn();
         for (ClientHandler handler : clients){
             handler.sendBoard(ascii);
+            handler.sendMessage(Protocol.MSG_TURN + " " + currentTurn);
         }
     }
 
@@ -48,10 +53,17 @@ public class GameSession {
 
     public synchronized void pass(Player player){
         gameController.pass(player.getKolor());
+        broadcastBoard();
     }
 
     public synchronized void ff(Player player){
-        gameController.ff(player.getKolor());
+        String resultMsg = gameController.ff(player.getKolor());
+
+        if (resultMsg != null){
+            for (ClientHandler handler : clients){
+                handler.sendMessage(resultMsg);
+            }
+        }
     }
 
     public synchronized void confirm(Player player){
@@ -67,5 +79,6 @@ public class GameSession {
 
     public synchronized void reject(Player player){
         gameController.reject(player.getKolor());
+        broadcastBoard();
     }
 }

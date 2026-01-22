@@ -20,6 +20,10 @@ public class GameController {
     private double blackPoints = 0;
     private double whitePoints = 6.5;
 
+    public synchronized Kolor getCurrentTurn() {
+        return turn;
+    }
+
     public synchronized boolean makeMove(int x, int y, Kolor kolorGracza) {
         if (kolorGracza != turn){
             return false;
@@ -75,9 +79,9 @@ public class GameController {
      * Poddanie gry przez gracza
      * @param kolorGracza kolor gracza poddajacego gre
      */
-    public synchronized void ff(Kolor kolorGracza){
+    public synchronized String ff(Kolor kolorGracza){
         gameWinner = (kolorGracza == Kolor.BLACK) ? Kolor.WHITE : Kolor.BLACK;
-        gameEnd();
+        return gameEnd();
     }
 
     /**
@@ -123,7 +127,7 @@ public class GameController {
      */
     private synchronized String gameEnd(){
         if(gameWinner != null){
-            return Protocol.MSG_GAME_OVER + " " + gameWinner + " " + blackPoints + " " + whitePoints;
+            return Protocol.MSG_GAME_OVER + " " + gameWinner + " - -";
         }
 
         int[] captured = board.removeDeadStones();

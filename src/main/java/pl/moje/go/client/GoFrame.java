@@ -12,6 +12,7 @@ public class GoFrame extends Frame {
     private GameClient client;
 
     private final Label statusLabel;
+    private final Label turnLabel;
     private final Button btnPass;
     private final Button btnSurrender;
     private final Button btnAccept;
@@ -26,6 +27,12 @@ public class GoFrame extends Frame {
         statusLabel.setAlignment(Label.CENTER);
         statusLabel.setBackground(Color.LIGHT_GRAY);
         add(statusLabel, BorderLayout.NORTH);
+
+        turnLabel = new Label("---");
+        turnLabel.setAlignment(Label.CENTER);
+        turnLabel.setFont(new Font("Dialog", Font.BOLD, 14));
+        turnLabel.setBackground(new Color(200, 255, 200));
+        add(turnLabel, BorderLayout.SOUTH);
 
         boardCanvas = new BoardCanvas(size);
         add(boardCanvas, BorderLayout.CENTER);
@@ -87,5 +94,11 @@ public class GoFrame extends Frame {
 
     public void setMessage(String msg) {
         statusLabel.setText(msg);
+    }
+
+    public void setTurnInfo(String msg) {
+        turnLabel.setText(msg);
+        if (msg.startsWith("TWÓJ")) turnLabel.setBackground(Color.GREEN);
+        else turnLabel.setBackground(Color.LIGHT_GRAY);
     }
 }
