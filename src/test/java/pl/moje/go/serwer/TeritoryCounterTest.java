@@ -34,4 +34,19 @@ class TeritoryCounterTest {
         assertEquals(1, result[0], "Czarne powinny mieć 1 punkt terytorium");
         assertEquals(0, result[1], "Białe powinny mieć 0 punktów");
     }
+
+    @Test
+    void testNeutralTerritory() {
+
+        board[5][4] = Kolor.BLACK;
+        board[5][6] = Kolor.WHITE;
+
+        board[4][5] = Kolor.BLACK;
+        board[6][5] = Kolor.WHITE;
+
+        int[] result = counter.count(board);
+
+        assertEquals(0, result[0]);
+        assertEquals(0, result[1]);
+    }
 }
