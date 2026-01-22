@@ -26,8 +26,8 @@ public class TeritoryCounter {
         for(int y = 0; y < n; y++){
             for(int x = 0; x < n; x++){
                 if(!visited[y][x]) {
-                    visited[y][x] = true;
                     if (fields[y][x] == Kolor.NONE) {
+                        visited[y][x] = true;
                         Kolor color = Kolor.NONE;
                         int counter = 1;
 
