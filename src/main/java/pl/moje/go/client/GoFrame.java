@@ -6,6 +6,13 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * Główne okno aplikacji oparte na bibliotece AWT.
+ * <p>
+ * Kontener dla płótna z planszą {@link BoardCanvas} oraz panelu sterowania.
+ * Odpowiada za inicjalizację przycisków i etykiet oraz udostępnianie metod
+ * do bezpiecznej aktualizacji widoku z poziomu wątku klienta.
+ */
 public class GoFrame extends Frame {
 
     private final BoardCanvas boardCanvas;
@@ -18,6 +25,11 @@ public class GoFrame extends Frame {
     private final Button btnAccept;
     private final Button btnReject;
 
+    /**
+     * Tworzy nowe okno gry.
+     *
+     * @param size rozmiar planszy (ilość przecięć linii, np. 19)
+     */
     public GoFrame(int size) {
         super("Go");
 
@@ -82,20 +94,41 @@ public class GoFrame extends Frame {
         });
     }
 
+    /**
+     * Ustawia referencję do obiektu klienta sieciowego.
+     * Wymagane, aby przyciski mogły wysyłać komendy do serwera.
+     *
+     * @param client obiekt obsługujący komunikację
+     */
     public void setClient(GameClient client) {
         this.client = client;
         boardCanvas.setClient(client);
         setMessage("Połączono z serwerem.");
     }
 
+    /**
+     * Przekazuje nową tablicę stanu planszy do komponentu rysującego.
+     *
+     * @param board dwuwymiarowa tablica kolorów reprezentująca układ kamieni
+     */
     public void updateBoard(Kolor[][] board) {
         boardCanvas.setBoard(board);
     }
 
+    /**
+     * Wyświetla komunikat systemowy na górnym pasku statusu.
+     *
+     * @param msg treść wiadomości
+     */
     public void setMessage(String msg) {
         statusLabel.setText(msg);
     }
 
+    /**
+     * Aktualizuje informację o bieżącej turze (np. "TWÓJ RUCH").
+     *
+     * @param msg treść informacji o turze
+     */
     public void setTurnInfo(String msg) {
         turnLabel.setText(msg);
         if (msg.startsWith("TWÓJ")) turnLabel.setBackground(Color.GREEN);

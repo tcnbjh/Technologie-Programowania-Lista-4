@@ -3,8 +3,21 @@ package pl.moje.go.client;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Główna klasa uruchomieniowa aplikacji klienta gry Go.
+ * <p>
+ * Odpowiada za nawiązanie połączenia TCP z serwerem,
+ * inicjalizację graficznego interfejsu użytkownika (GUI)
+ * oraz uruchomienie wątku obsługującego komunikację sieciową.
+ */
 public class ClientMain {
 
+    /**
+     * Punkt wejścia do aplikacji klienta.
+     *
+     * @param args argumenty wiersza poleceń (nieużywane)
+     * @throws Exception w przypadku błędu połączenia z serwerem lub wejścia/wyjścia
+     */
     public static void main(String[] args) throws Exception {
 
         int size = 19;

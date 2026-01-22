@@ -6,6 +6,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * Komponent graficzny (Canvas) odpowiedzialny za rysowanie planszy do gry w Go.
+ * <p>
+ * Rysuje siatkę, kropki (hoshi), kamienie graczy oraz oznaczenia martwych grup.
+ * Obsługuje zdarzenia myszy, tłumacząc kliknięcia w pikselach na współrzędne planszy.
+ */
 public class BoardCanvas extends Canvas {
 
     private final int size;
@@ -15,12 +21,17 @@ public class BoardCanvas extends Canvas {
     private int cell;
     private int offset;
 
+    /**
+     * Inicjuje płótno o zadanej wielkości logicznej planszy.
+     *
+     * @param size rozmiar siatki (np. 19x19)
+     */
     public BoardCanvas(int size) {
         this.size = size;
         this.board = new Kolor[size][size];
         clearBoard();
 
-        setBackground(new Color(220, 179, 92)); // Kolor drewna (Goban)
+        setBackground(new Color(220, 179, 92));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -46,18 +57,15 @@ public class BoardCanvas extends Canvas {
     }
 
     private void updateGeometry() {
-        // Obliczamy rozmiar komórki tak, aby plansza mieściła się w oknie z marginesem
         int minDym = Math.min(getWidth(), getHeight());
         cell = minDym / (size + 1);
-        offset = cell; // Margines równy jednej kratce
+        offset = cell;
     }
 
     private void handleClick(int mx, int my) {
         if (client == null) return;
         updateGeometry();
 
-        // Prosta matematyka do znalezienia najbliższego przecięcia
-        // Dodajemy 0.5 (czyli cell/2) przed dzieleniem dla zaokrąglenia (round logic)
         float fx = (float)(mx - offset) / cell;
         float fy = (float)(my - offset) / cell;
 
@@ -69,21 +77,23 @@ public class BoardCanvas extends Canvas {
         }
     }
 
+    /**
+     * Rysuje zawartość komponentu: tło, linie, opisy i kamienie.
+     * Wywoływana automatycznie przez system lub przez repaint().
+     *
+     * @param g kontekst graficzny
+     */
     @Override
     public void paint(Graphics g) {
         updateGeometry();
 
-        // Rysowanie linii siatki
         g.setColor(Color.BLACK);
         for (int i = 0; i < size; i++) {
             int p = offset + i * cell;
-            // Linie pionowe
             g.drawLine(offset + i * cell, offset, offset + i * cell, offset + (size - 1) * cell);
-            // Linie poziome
             g.drawLine(offset, p, offset + (size - 1) * cell, p);
         }
 
-        // Rysowanie kropek (hoshi) - opcjonalne, ale pomocne na planszy 19x19
         if (size == 19) {
             drawHoshi(g, 3, 3);
             drawHoshi(g, 15, 3);
@@ -92,7 +102,6 @@ public class BoardCanvas extends Canvas {
             drawHoshi(g, 9, 9);
         }
 
-        // Rysowanie kamieni
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 Kolor k = board[y][x];
@@ -100,7 +109,7 @@ public class BoardCanvas extends Canvas {
 
                 int cx = offset + x * cell;
                 int cy = offset + y * cell;
-                int r = cell * 9 / 20; // Promień kamienia (trochę mniejszy niż pół kratki)
+                int r = cell * 9 / 20;
 
                 if (k == Kolor.BLACK || k == Kolor.DEAD_BLACK) {
                     g.setColor(Color.BLACK);
@@ -114,7 +123,7 @@ public class BoardCanvas extends Canvas {
                 } else if (k == Kolor.WHITE || k == Kolor.DEAD_WHITE) {
                     g.setColor(Color.WHITE);
                     g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
-                    g.setColor(Color.BLACK); // Obwódka dla białego kamienia
+                    g.setColor(Color.BLACK);
                     g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
 
                     if (k == Kolor.DEAD_WHITE) {

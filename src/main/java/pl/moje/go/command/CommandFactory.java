@@ -2,8 +2,20 @@ package pl.moje.go.command;
 
 import pl.moje.go.common.Protocol;
 
+/**
+ * Fabryka tworząca obiekty komend na podstawie tekstu.
+ * <p>
+ * Analizuje pierwszą linię przesłaną przez klienta (zgodnie z protokołem),
+ * parsuje parametry i zwraca odpowiednią instancję implementującą {@link Command}.
+ */
 public class CommandFactory {
 
+    /**
+     * Tworzy obiekt komendy na podstawie linii tekstu.
+     *
+     * @param line surowy ciąg znaków odebrany z sieci (np. "MOVE 3 4")
+     * @return odpowiedni obiekt Command lub InvalidCommand w przypadku błędu
+     */
     public static Command fromLine(String line) {
         String[] parts = line.split(" ");
         String cmd = parts[0].toUpperCase();

@@ -3,6 +3,10 @@ package pl.moje.go.command;
 import pl.moje.go.common.Protocol;
 import pl.moje.go.serwer.ClientContext;
 
+/**
+ * Komenda obsługująca próbę postawienia kamienia na planszy.
+ * Waliduje ruch i aktualizuje stan gry.
+ */
 public class MoveCommand implements Command {
 
     private final int x;
